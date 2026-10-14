@@ -295,14 +295,42 @@ pub fn control_bar(app: &mut VectorcraftApp, ui: &mut Ui) {
                 ui.separator();
                 crate::panels::character::control_bar(app, ui);
                 if sel.is_empty() {
-                    if widgets::flat_button(ui, tl!("Document Setup"), 112.0).clicked() {
-                        app.run("file.documentSetup", json!({})).ok();
-                    }
-                    if widgets::flat_button(ui, tl!("Preferences"), 90.0).clicked() {
-                        app.run("edit.preferences", json!({})).ok();
-                    }
-                    return;
-                }
+                 // CorelDRAW Property Bar, когда ничего не выделено: размер листа, ориентация и единицы измерения
+                 let ab_idx = app.view().map_or(0, |v| v.artboard);
+                 if let Some(ab) = st.doc.artboards.get(ab_idx).or_else(|| st.doc.artboards.first()).cloned() {
+                     let (w, h) = (ab.rect.width(), ab.rect.height());
+                     widgets::field_label(ui, egui::RichText::new("Ш:").size(12.0).color(t.text_dim));
+                     if let Some(nw) = widgets::num_field(ui, "cb-ab-w", Some(w), units, 76.0) {
+                         app.run("artboard.setProps", json!({"index": ab_idx, "width": nw.max(1.0)})).ok();
+                     }
+                     widgets::field_label(ui, egui::RichText::new("В:").size(12.0).color(t.text_dim));
+                     if let Some(nh) = widgets::num_field(ui, "cb-ab-h", Some(h), units, 76.0) {
+                         app.run("artboard.setProps", json!({"index": ab_idx, "height": nh.max(1.0)})).ok();
+                     }
+                     if widgets::flat_button(ui, "⇄ Повернуть лист", 110.0).clicked() {
+                         app.run("artboard.setProps", json!({"index": ab_idx, "width": h, "height": w})).ok();
+                     }
+                     ui.separator();
+                 }
+                 if widgets::flat_button(ui, "Ед: мм", 58.0).on_hover_text("Установить миллиметры").clicked() {
+                     app.run("prefs.set", json!({"key": "generalUnits", "value": "mm"})).ok();
+                 }
+                 if widgets::flat_button(ui, tl!("Document Setup"), 112.0).clicked() {
+                     app.run("file.documentSetup", json!({})).ok();
+                 }
+                 if widgets::flat_button(ui, tl!("Preferences"), 90.0).clicked() {
+                     app.run("edit.preferences", json!({})).ok();
+                 }
+                 return;
+             }
+             // Быстрые кнопки препресса CorelDRAW на верхней панели при выделенном объекте
+             if widgets::flat_button(ui, "Контур (Offset)", 105.0).on_hover_text("Создать внешний/внутренний контур реза").clicked() {
+                 app.run("object.path.offsetPath", json!({})).ok();
+             }
+             if widgets::flat_button(ui, "В кривые (Ctrl+Q)", 115.0).clicked() {
+                 app.run("type.createOutlines", json!({})).ok();
+             }
+             ui.separator();
                 crate::panels::align::align_buttons(app, ui, 24.0);
                 ui.separator();
                 // The Transform link opens the whole Transform panel (reference point, rotate,
