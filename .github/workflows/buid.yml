@@ -1,0 +1,29 @@
+name: Build VectorCraft Windows EXE
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Скачивание исходников
+        uses: actions/checkout@v4
+
+      - name: Установка компилятора Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Кэширование библиотек (чтобы следующие сборки шли за 1 минуту)
+        uses: Swatinem/rust-cache@v2
+
+      - name: Компиляция VectorCraft.exe
+        run: cargo build --release --bin vectorcraft
+
+      - name: Упаковка готового .exe для скачивания
+        uses: actions/upload-artifact@v4
+        with:
+          name: CorelCraft-Windows-EXE
+          path: target/release/vectorcraft.exe
