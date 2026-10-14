@@ -17,7 +17,7 @@ use crate::state::{Dialog, UiState};
 use crate::theme::{self, Tokens};
 use crate::{VectorcraftApp, menus, widgets};
 
-pub const PRESETS: &[&str] = &["VectorCraft Defaults", "Classic Defaults"];
+pub const PRESETS: &[&str] = &["CorelDRAW Defaults", "VectorCraft Defaults", "Classic Defaults"];
 pub const CUSTOM: &str = "Custom";
 /// Set names earlier versions saved: (old name, current name).
 pub const LEGACY_PRESETS: &[(&str, &str)] = &[("Illustrator Defaults", "Classic Defaults")]; // brand-ok: legacy preference value
@@ -125,6 +125,30 @@ pub const PANEL_SHORTCUTS: &[(&str, &str)] = &[
 
 /// Default shortcut of an entry key (`tool:<id>`, `panel:<id>` or a command id).
 pub fn default_of(key: &str) -> Option<&'static str> {
+    match key {
+        // Инструменты как в CorelDRAW
+        "tool:selection" => return Some("V"),
+        "tool:directSelection" => return Some("F10"),
+        "tool:rectangle" => return Some("F6"),
+        "tool:ellipse" => return Some("F7"),
+        "tool:type" => return Some("F8"),
+        "tool:pen" => return Some("F5"),
+        "tool:zoom" => return Some("Z"),
+        "tool:hand" => return Some("H"),
+        // Команды как в CorelDRAW
+        "object.group" => return Some("Cmd+G"),
+        "object.ungroup" => return Some("Cmd+U"),
+        "edit.duplicate" => return Some("Cmd+D"),
+        "type.createOutlines" => return Some("Cmd+Q"),
+        "view.fitAll" => return Some("F4"),
+        "view.fitArtboard" => return Some("Shift+F4"),
+        "view.outline" => return Some("F9"),
+        "object.arrange.bringToFront" => return Some("Shift+PageUp"),
+        "object.arrange.sendToBack" => return Some("Shift+PageDown"),
+        "object.arrange.bringForward" => return Some("Cmd+PageUp"),
+        "object.arrange.sendBackward" => return Some("Cmd+PageDown"),
+        _ => {}
+    }
     if let Some(t) = key.strip_prefix("tool:") {
         return vectorcraft_tools::tool_info(t).and_then(|t| t.shortcut);
     }
