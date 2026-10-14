@@ -188,7 +188,7 @@ pub struct ViewFlags {
 impl Default for ViewFlags {
     fn default() -> Self {
         Self {
-            rulers: false,
+            rulers: true,
             grid: false,
             guides: true,
             smart_guides: true,
@@ -668,11 +668,11 @@ impl Default for UiState {
             dock_tab: DockTab::Properties,
             dock_collapsed: false,
             open_panel: None,
-            control_bar: false,
+            control_bar: true,
             toolbar: true,
             toolbar_double: false,
-            toolbar_advanced: false,
-            task_bar: true,
+            toolbar_advanced: true,
+            task_bar: false,
             task_bar_place: TaskBarPlace::default(),
             slot_tool: Default::default(),
             floating_flyouts: vec![],
