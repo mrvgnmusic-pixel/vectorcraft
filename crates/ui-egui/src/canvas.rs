@@ -682,10 +682,16 @@ fn handle_input(app: &mut VectorcraftApp, ui: &Ui, resp: &egui::Response, rect: 
                     ui.data_mut(|dd| dd.insert_temp(drag_id(), Drag::Art));
                 }
                 Drag::Tool => {
-                    if pointer.delta() != egui::Vec2::ZERO {
-                        let ev = PointerEvent { kind: PointerKind::Drag, pos: xf.to_doc(p), mods: mods(m, space), pressure: pen_pressure(ui, false) };
-                        dispatch(app, &ev, view);
-                    }
+                 // CorelDRAW: правый клик мыши во время перетаскивания оставляет оригинал (делает дубликат)
+                 if pointer.button_pressed(egui::PointerButton::Secondary) {
+                     let mut m_copy = mods(m, space);
+                     m_copy.alt = true;
+                     let ev = PointerEvent { kind: PointerKind::Drag, pos: xf.to_doc(p), mods: m_copy, pressure: pen_pressure(ui, false) };
+                     dispatch(app, &ev, view);
+                 } else if pointer.delta() != egui::Vec2::ZERO {
+                     let ev = PointerEvent { kind: PointerKind::Drag, pos: xf.to_doc(p), mods: mods(m, space), pressure: pen_pressure(ui, false) };
+                     dispatch(app, &ev, view);
+                 }
                     // Time held (Twirl, Pucker and Bloat keep applying); a stalled frame counts
                     // a quarter second at most.
                     if app.session.tool_wants_ticks() {
