@@ -547,7 +547,7 @@ fn cursor_icon(c: Cursor) -> egui::CursorIcon {
 
 fn handle_input(app: &mut VectorcraftApp, ui: &Ui, resp: &egui::Response, rect: egui::Rect) {
     let line = ui.ctx().options(|o| o.input_options.line_scroll_speed);
-    let wheel_zooms = app.session.prefs.zoom_with_mouse_wheel;
+    let wheel_zooms = true; // CorelDRAW: колесо мыши всегда зумит в точку курсора
     let turn_id = egui::Id::new("canvas-wheel-turn");
     let turn_before: WheelTurn = ui.data(|d| d.get_temp(turn_id)).unwrap_or_default();
     let mut turn = turn_before;
