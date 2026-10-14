@@ -485,6 +485,32 @@ pub fn handle(app: &mut VectorcraftApp, ctx: &egui::Context) {
             continue;
         }
         let upper = text.to_uppercase();
+        // --- ХОТКЕИ ВЫРАВНИВАНИЯ CORELDRAW ---
+        let sel_count = app.session.active().map_or(0, |d| d.selection.objects.len());
+        if sel_count >= 1 && ! m.shift {
+            if upper == "P" {
+                // P — Выровнять объект ровно по центру страницы (Artboard)
+                let ab = app.view().map_or(0, |v| v.artboard);
+                let _ = app.run("object.align", json!({"horizontal": "center", "vertical": "center", "to": "artboard", "artboard": ab}));
+                continue;
+            }
+            if sel_count >= 2 {
+                let align_cmd = match upper.as_str() {
+                    "C" => Some(json!({"horizontal": "center", "to": "selection"})),
+                    "E" => Some(json!({"vertical": "center", "to": "selection"})),
+                    "L" => Some(json!({"horizontal": "left", "to": "selection"})),
+                    "R" => Some(json!({"horizontal": "right", "to": "selection"})),
+                    "T" => Some(json!({"vertical": "top", "to": "selection"})),
+                    "B" => Some(json!({"vertical": "bottom", "to": "selection"})),
+                    _ => None,
+                };
+                if let Some(params) = align_cmd {
+                    let _ = app.run("object.align", params);
+                    continue;
+                }
+            }
+        }
+        // -------------------------------------
         let key = if m.shift && text.chars().all(|c| c.is_alphabetic()) { format!("Shift+{upper}") } else { upper.clone() };
         // A shifted punctuation character can also be written with its Shift (the Curvature tool's
         // Shift+~ arrives as `~`).
